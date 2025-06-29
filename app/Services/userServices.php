@@ -51,6 +51,7 @@ class UserServices
     public static function addContact($email = null, $user_name = null)
     {
         $contact_user = null;
+        
         if ($email != null) {
             $contact_user = self::getUserByEmail($email);
         } elseif ($user_name != null) {

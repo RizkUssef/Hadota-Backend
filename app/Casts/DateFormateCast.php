@@ -8,6 +8,8 @@ use Illuminate\Support\Carbon;
 
 class DateFormateCast implements CastsAttributes
 {
+    // protected $short;
+     public function __construct(protected bool $short = false){ }
     /**
      * Cast the given value.
      *
@@ -16,6 +18,7 @@ class DateFormateCast implements CastsAttributes
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
         return Carbon::parse($value)->format('Y-m-d');  
+        // return Carbon::parse($value)->diffForHumans(short:$this->short);  
     }
 
     /**

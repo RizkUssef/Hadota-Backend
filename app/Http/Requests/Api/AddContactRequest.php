@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetUserByEmail extends FormRequest
+class AddContactRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,9 @@ class GetUserByEmail extends FormRequest
     public function rules(): array
     {
         return [
-            "email"=>"required|email|exists:users,email"
+            "email" => "nullable|email|exists:users,email",
+            "user_name" => "nullable|string|exists:users,user_name"
+
         ];
     }
 }

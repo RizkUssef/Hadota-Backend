@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\AddContactRequest;
 use App\Http\Requests\Api\GetUserByEmail;
 use App\Http\Requests\Api\GetUserByUserName;
 use App\Http\Requests\Api\RegisterRequest;
@@ -20,10 +21,6 @@ class UserController extends Controller
      */
     public function index()
     {
-
-        // $users =auth()->user();
-        // $user = JWTAuth::parseToken()->authenticate();
-        // dd($user);
         $users = UserServices::getUser();
         if ($users) {
             return ApiResponseTrait::Success($users, "data returned successfully");
@@ -65,15 +62,13 @@ class UserController extends Controller
         //
     }
 
-    public function addContactByEmail(GetUserByEmail $request)
+    public function addContact(AddContactRequest $request)
     {
-        $email = $request->validated();
-        return UserServices::addContact($email);
-    }
-
-    public function addContactByUserName(GetUserByUserName $request)
-    {
-        $user_name = $request->validated();
-        return UserServices::addContact("", $user_name);
+        $user = $request->validated();
+        if($request->input("email") && $user["email"]){
+            return UserServices::addContact($user);
+        }elseif($request->input("user_name") && $user["user_name"]){
+            return UserServices::addContact("", $user);
+        }
     }
 }

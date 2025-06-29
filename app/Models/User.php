@@ -28,8 +28,9 @@ class User extends Authenticatable implements JWTSubject
 
     // * use custum casts to return the created at and updated at in y-m-d format 
     protected $casts =[
-        "created_at" => DateFormateCast::class ,
-        "updated_at" => DateFormateCast::class
+        "created_at" => DateFormateCast::class,
+        "updated_at" => DateFormateCast::class,
+        // "updated_at" => DateFormateCast::class.':short',
     ];
     
     // * mutator function to hash the pass 
