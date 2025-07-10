@@ -7,11 +7,14 @@ use App\Http\Requests\Api\AddContactRequest;
 use App\Http\Requests\Api\GetUserByEmail;
 use App\Http\Requests\Api\GetUserByUserName;
 use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\UserUpdateRequest;
 use App\Http\Resources\Api\UserResource;
+use App\Models\User;
 use App\Services\UserServices;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
@@ -21,9 +24,20 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = UserServices::getUser();
+        $user = UserServices::getUser();
+        if ($user) {
+            return ApiResponseTrait::Success($user, "data returned successfully");
+        }else{
+            return ApiResponseTrait::Failed("No user Found", 404);
+        }
+    }
+
+    public function allUsers(){
+        $users = UserServices::getAllUsers();
         if ($users) {
             return ApiResponseTrait::Success($users, "data returned successfully");
+        } else {
+            return ApiResponseTrait::Failed("No user Found", 404);
         }
     }
 
@@ -37,21 +51,31 @@ class UserController extends Controller
         return ApiResponseTrait::Success($user, "user inserted successfully");
     }
 
-    /**
-     * Display the specified resource.
-     */
-    // public function show()
-    // {
-    //     $user = UserServices::getUser();
-    //     dd($user);
-    // }
+    public function userChats()
+    {
+        $contacts = UserServices::getUserChats();
+        if ($contacts) {
+            return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
+        }
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateUser(UserUpdateRequest $request)
     {
-        //
+        $user = auth()->user();
+
+        $data = $request->validated();
+
+        if ($request->hasFile('avatar_url')) {
+            if ($user->avatar_url && Storage::disk("public")->exists($user->avatar_url)) {
+                Storage::disk('public')->delete($user->avatar_url);
+            }
+            $data['avatar_url']  = $request->file('avatar_url')->store('Uploads/Users Avatar', 'public');
+        }
+        $user = UserServices::update($user, $data);
+        return ApiResponseTrait::Success($user, "user updated successfully");
     }
 
     /**
@@ -65,9 +89,9 @@ class UserController extends Controller
     public function addContact(AddContactRequest $request)
     {
         $user = $request->validated();
-        if($request->input("email") && $user["email"]){
+        if ($request->input("email") && $user["email"]) {
             return UserServices::addContact($user);
-        }elseif($request->input("user_name") && $user["user_name"]){
+        } elseif ($request->input("user_name") && $user["user_name"]) {
             return UserServices::addContact("", $user);
         }
     }

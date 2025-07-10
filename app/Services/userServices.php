@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
+use function PHPSTORM_META\map;
 
 class UserServices
 {
@@ -24,14 +25,15 @@ class UserServices
 
     public static function getUser()
     {
-        if (request()->has("id")) {
-            $id = request()->get("id");
-            $user = User::findOrFail($id);
-            return  UserResource::collection(collect([$user]));
-        } else {
-            $users = User::all();
-            return UserResource::collection($users);
+        if (auth()->user()) {
+            return  UserResource::collection(collect([auth()->user()]));
         }
+    }
+
+    public static function getAllUsers()
+    {
+        $users = User::all();
+        return UserResource::collection($users);
     }
 
     public static function getUserByEmail($email)
@@ -51,7 +53,7 @@ class UserServices
     public static function addContact($email = null, $user_name = null)
     {
         $contact_user = null;
-        
+
         if ($email != null) {
             $contact_user = self::getUserByEmail($email);
         } elseif ($user_name != null) {
@@ -85,11 +87,32 @@ class UserServices
         }
     }
 
-    public static function update($id, $data)
+    // ? return user contacts chats
+    public static function getUserChats()
     {
-        $user = User::findOrFail($id);
-        $user_updated = $user->update($data);
-        return $user_updated;
+        $user = auth()->user();
+        if ($user) {
+            $contactUsers = $user->contacts->map(function ($contact) {
+                return $contact->contact;
+            });
+            return UserResource::collection($contactUsers);
+        }
+    }
+
+    public static function update(User $user, $data)
+    {
+        // $user = auth()->user();
+        if ($user) {
+            // dd($data);
+            $user->update($data);
+            // dd($user);
+            // return $user;
+            return new UserResource($user);
+
+            // return UserResource::collection(collect($user));
+        } else {
+            return ApiResponseTrait::Failed("user not found", 400);
+        }
     }
 
     public static function delete($id)

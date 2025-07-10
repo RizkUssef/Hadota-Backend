@@ -17,7 +17,10 @@ Route::post("/login", [LoginController::class, "login"])->name("api login");
 Route::apiResources([
     'user' => UserController::class,
 ]);
-Route::post("add contant",[UserController::class, "addContact"])->name("add contact");
-// Route::post("add contant by username",[UserController::class, "addContactByUserName"])->name("add contact by username");
 Route::middleware(['jwt.auth'])->group(function () {
+    Route::post("userupdate", [UserController::class, "updateUser"])->name("update user");
+    Route::post("add contant", [UserController::class, "addContact"])->name("add contact");
+    Route::get("userchats", [UserController::class, "userChats"])->name("user chats");
+    // Route::post("add contant by username",[UserController::class, "addContactByUserName"])->name("add contact by username");
 });
+
