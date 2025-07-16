@@ -31,6 +31,16 @@ class UserController extends Controller
             return ApiResponseTrait::Failed("No user Found", 404);
         }
     }
+    
+    public function getUserWithId($id){
+        $user = UserServices::getUserWithId($id);
+        if ($user) {
+            return ApiResponseTrait::Success($user, "data returned successfully");
+        }else{
+            return ApiResponseTrait::Failed("No user Found", 404);
+        }
+
+    }
 
     public function allUsers(){
         $users = UserServices::getAllUsers();

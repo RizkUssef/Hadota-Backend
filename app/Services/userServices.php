@@ -7,6 +7,7 @@ use App\Http\Requests\Api\LoginRequest;
 use App\Http\Resources\Api\ContactResource;
 use App\Http\Resources\Api\UserResource;
 use App\Models\Contacts;
+use App\Models\Conversations;
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,14 @@ class UserServices
     {
         if (auth()->user()) {
             return  UserResource::collection(collect([auth()->user()]));
+        }
+    }
+
+    public static function getUserWithId($id)
+    {
+        if ($id) {
+            $user = User::findOrFail($id);
+            return  UserResource::collection(collect([$user]));
         }
     }
 
@@ -77,6 +86,11 @@ class UserServices
                         "contact_id" => $contact_user->id,
                         "nickname" => $contact_user->user_name,
                         "blocked" => 0
+                    ]);
+                    Conversations::create([
+                        "type" => "private",
+                        "created_by"=> $user->id ,
+                        "name"=> $contact_user->user_name
                     ]);
                     $contact_return = ContactResource::collection(collect([$contact]));
                     return ApiResponseTrait::Success($contact_return, "contact added successfully");
