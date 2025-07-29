@@ -62,7 +62,6 @@ class UserServices
     public static function addContact($email = null, $user_name = null)
     {
         $contact_user = null;
-
         if ($email != null) {
             $contact_user = self::getUserByEmail($email);
         } elseif ($user_name != null) {
@@ -101,29 +100,11 @@ class UserServices
         }
     }
 
-    // ? return user contacts chats
-    public static function getUserChats()
-    {
-        $user = auth()->user();
-        if ($user) {
-            $contactUsers = $user->contacts->map(function ($contact) {
-                return $contact->contact;
-            });
-            return UserResource::collection($contactUsers);
-        }
-    }
-
     public static function update(User $user, $data)
     {
-        // $user = auth()->user();
         if ($user) {
-            // dd($data);
             $user->update($data);
-            // dd($user);
-            // return $user;
             return new UserResource($user);
-
-            // return UserResource::collection(collect($user));
         } else {
             return ApiResponseTrait::Failed("user not found", 400);
         }
@@ -131,9 +112,6 @@ class UserServices
 
     public static function delete($id)
     {
-        // $user = User::findOrFail($id);
-        // $user_deleted = $user->delete();
-        // return $user_deleted;
         return User::destroy($id);
     }
 

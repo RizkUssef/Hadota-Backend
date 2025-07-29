@@ -31,7 +31,7 @@ class UserController extends Controller
             return ApiResponseTrait::Failed("No user Found", 404);
         }
     }
-    
+    // get current chat 
     public function getUserWithId($id){
         $user = UserServices::getUserWithId($id);
         if ($user) {
@@ -39,7 +39,6 @@ class UserController extends Controller
         }else{
             return ApiResponseTrait::Failed("No user Found", 404);
         }
-
     }
 
     public function allUsers(){
@@ -60,14 +59,14 @@ class UserController extends Controller
         $user = UserServices::create($data);
         return ApiResponseTrait::Success($user, "user inserted successfully");
     }
-
-    public function userChats()
-    {
-        $contacts = UserServices::getUserChats();
-        if ($contacts) {
-            return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
-        }
-    }
+// ? return all user chats
+    // public function userChats()
+    // {
+    //     $contacts = UserServices::getUserChats();
+    //     if ($contacts) {
+    //         return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
+    //     }
+    // }
 
     /**
      * Update the specified resource in storage.
