@@ -9,7 +9,7 @@ use App\Models\Messages;
 
 class ChatsServices{
     // ? return user contacts chats
-    public static function getUserChats()
+    public static function userContacts()
     {
         $user = auth()->user();
         if ($user) {
@@ -24,19 +24,25 @@ class ChatsServices{
         $user = auth()->user();
         if ($user) {
             if($data){
+                $conversation = Conversations::where('created_by',$user->id);
+
                 $message = Messages::create($data);
                 return $message;
             }
         }
     }
 
-    public static function getConversation(){
+    public static function getAllConversations(){
         $user = auth()->user();
         if ($user) {
-            $msg = Messages::with(['conversation', 'statuses'])
-            ->where("sender_id" , $user->id)
-            ->whereHas("statuses",fn($q) => $q->where('status', "delivered"))
-            ->get();
+            $convs = Conversations::where('created_by',auth()->id())->get();
+            return $convs;
+            // return $convs[0]->creator;
+            // return $convs[0]->messages;
+            // $msg = Messages::with(['conversation', 'statuses'])
+            // ->where("sender_id" , $user->id)
+            // ->whereHas("statuses",fn($q) => $q->where('status', "delivered"))
+            // ->get();
         }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\MessageRequest;
+use App\Models\Conversations;
 use App\Services\ChatsServices;
 use App\Services\UserServices;
 use App\Traits\ApiResponseTrait;
@@ -16,7 +17,7 @@ class ChatController extends Controller
     //? return all contacts
     public function userContacts()
     {
-        $contacts = ChatsServices::getUserChats();
+        $contacts = ChatsServices::userContacts();
         if (!empty($contacts)) {
             return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
         }else{
@@ -37,9 +38,15 @@ class ChatController extends Controller
 
     public function sendMessage(MessageRequest $request){
         $data = $request->validated();
+        // get conv
         // add the conv id and user id
-        $data[]
+        // $data[];
         $message = ChatsServices::sendMessage($data);
         return ApiResponseTrait::Success($message, "message sent successfully");
+    }
+
+    public function getAllConversations(){
+        $convs = ChatsServices::getAllConversations();
+        dd($convs);
     }
 }

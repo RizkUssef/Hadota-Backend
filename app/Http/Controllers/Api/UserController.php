@@ -104,4 +104,15 @@ class UserController extends Controller
             return UserServices::addContact("", $user);
         }
     }
+
+    public function addContactToConversation($contact_id)
+    {
+        $add_res = UserServices::addContactToConversation($contact_id);
+        if($add_res){
+            $chat_controller = new ChatController;
+            return $chat_controller->currentChat($contact_id);
+        }else{
+            return ApiResponseTrait::Failed("Conflict : you allready has this conversation", 409);
+        }
+    }
 }

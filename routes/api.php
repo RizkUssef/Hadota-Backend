@@ -21,9 +21,11 @@ Route::apiResources([
 Route::middleware(['jwt.auth'])->group(function () {
     Route::post("userupdate", [UserController::class, "updateUser"])->name("update user");
     Route::post("add contant", [UserController::class, "addContact"])->name("add contact");
+    Route::get("add convs/{contact_id}", [UserController::class, "addContactToConversation"])->name("add convs");
     Route::get("user contacts", [ChatController::class, "userContacts"])->name("user contacts");
     Route::get("current chat/{id}", [ChatController::class, "currentChat"])->name("current chat");
     Route::post("send msg", [ChatController::class, "sendMessage"])->name("send msg");
+    Route::get("user conversations", [ChatController::class, "getAllConversations"])->name("user conversations");
     // Route::post("add contant by username",[UserController::class, "addContactByUserName"])->name("add contact by username");
 });
 
