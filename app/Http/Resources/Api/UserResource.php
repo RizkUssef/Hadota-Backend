@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             "status" => $this->status,
             "last_seen_at" => $this->last_seen_at,
             "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "updated_at" => $this->updated_at,
         ];
     }
 }

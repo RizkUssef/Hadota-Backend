@@ -36,21 +36,25 @@ class ChatController extends Controller
         }
     }
 
-    public function sendMessage(MessageRequest $request){
-        $data = $request->validated();
-        // get conv
-        // add the conv id and user id
-        // $data[];
-        $message = ChatsServices::sendMessage($data);
-        return ApiResponseTrait::Success($message, "message sent successfully");
-    }
-
-    public function getAllConversations(){
-        $convs = ChatsServices::getAllConversations();
+    // ? get the all conversation and current conv
+    public function getConversations($id = null){
+        $convs = ChatsServices::getConversations($id);
         if($convs){
             return ApiResponseTrait::Success($convs, "data returned successfully");
         }else{
             return ApiResponseTrait::Failed("No data found", 404);
+        }
+    }
+
+
+    public function sendMessage(MessageRequest $request)
+    {
+        $data = $request->validated();
+        $message = ChatsServices::sendMessage($data);
+        if($message){
+            return ApiResponseTrait::Success($message, "message sent successfully");
+        }else{
+            return ApiResponseTrait::Failed("failed to send message",404);
         }
     }
 }
