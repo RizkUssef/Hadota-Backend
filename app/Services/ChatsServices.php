@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\Api\UserController;
 use App\Http\Requests\Api\MessageRequest;
 use App\Http\Resources\Api\UserResource;
 use App\Models\Conversations;
 use App\Models\Messages;
+use App\Models\User;
+use App\Traits\ApiResponseTrait;
 
-class ChatsServices{
+class ChatsServices
+{
     // ? return user contacts chats
     public static function userContacts()
     {
@@ -20,11 +24,12 @@ class ChatsServices{
         }
     }
 
-    public static function sendMessage($data){
+    public static function sendMessage($data)
+    {
         $user = auth()->user();
         if ($user) {
-            if($data){
-                $conversation = Conversations::where('created_by',$user->id);
+            if ($data) {
+                $conversation = Conversations::where('created_by', $user->id);
 
                 $message = Messages::create($data);
                 return $message;
@@ -32,17 +37,17 @@ class ChatsServices{
         }
     }
 
-    public static function getAllConversations(){
+    public static function getAllConversations()
+    {
         $user = auth()->user();
         if ($user) {
-            $convs = Conversations::where('created_by',auth()->id())->get();
-            return $convs;
-            // return $convs[0]->creator;
-            // return $convs[0]->messages;
-            // $msg = Messages::with(['conversation', 'statuses'])
-            // ->where("sender_id" , $user->id)
-            // ->whereHas("statuses",fn($q) => $q->where('status', "delivered"))
-            // ->get();
+            $user = User::with('conversations.participants.user')->find(auth()->id());
+            $user_conversations = $user->conversations->flatMap(function ($conv) {
+                return $conv->participants
+                    ->where('user_id', '!=', auth()->id())
+                    ->pluck('user');
+            })->unique('id')->values();
+            return UserResource::collection($user_conversations);
         }
     }
 }
