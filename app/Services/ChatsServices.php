@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Requests\Api\MessageRequest;
 use App\Http\Resources\Api\ConversationResource;
+use App\Http\Resources\Api\MessageResource;
 use App\Http\Resources\Api\UserResource;
 use App\Models\ConversationParticipants;
 use App\Models\Conversations;
@@ -32,15 +33,16 @@ class ChatsServices
         $user = auth()->user();
         if ($user) {
             $user = User::with('conversations.participants.user')->find(auth()->id());
-            $user_conversations = $user->conversations->flatMap(function ($conv) use($conv_id) {
+            $user_conversations = $user->conversations->flatMap(function ($conv) use ($conv_id) {
                 return $conv->participants
-                    ->when($conv_id, function($query) use($conv_id){
+                    ->when($conv_id, function ($query) use ($conv_id) {
                         return $query->where('conversation_id', $conv_id);
                     })
                     ->where('user_id', '!=', auth()->id())
-                    ->map(function($participant) use($conv){
+                    ->map(function ($participant) use ($conv) {
                         return [
-                            "user" => $participant->user,
+                            "sender_id"=>auth()->id(),
+                            "recipient_user" => $participant->user,
                             "conversation_id" => $conv->id
                         ];
                     });
@@ -54,20 +56,27 @@ class ChatsServices
         $user = auth()->user();
         if ($user) {
             if ($data) {
-                $conv = $user->participants->map(function ($vgt) use ($data) {
-                    return $vgt->whereIn('user_id', [auth()->id(), $data['sender_id']])
-                    ->select('conversation_id')
-                    ->first();
+                $conv = $user->participants->map(function ($participant) use ($data) {
+                    return $participant->whereIn('user_id', [auth()->id(), $data['sender_id']])
+                        ->select('conversation_id')
+                        ->first();
                 });
-                if($data["conversation_id"] == $conv[0]->conversation_id){
+                if ($data["conversation_id"] == $conv[0]->conversation_id) {
                     $msg = Messages::create($data);
                     return $msg;
-                }else{
+                } else {
                     return ApiResponseTrait::Failed("Wrong Conversation", 404);
                 }
             }
         }
     }
 
-
+    // ?get msgs
+    public static function getMessages($conv_id){
+        $user = auth()->user();
+        if($user){
+            $messages = Messages::where("conversation_id",$conv_id)->get();
+            return MessageResource::collection($messages);
+        }
+    }
 }

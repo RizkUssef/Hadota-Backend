@@ -57,4 +57,13 @@ class ChatController extends Controller
             return ApiResponseTrait::Failed("failed to send message",404);
         }
     }
+
+    public function getMessages($id){
+        $messages = ChatsServices::getMessages($id);
+        if ($messages) {
+            return ApiResponseTrait::Success($messages, "all messages returned successfully");
+        } else {
+            return ApiResponseTrait::Failed("failed to send message", 404);
+        }
+    }
 }

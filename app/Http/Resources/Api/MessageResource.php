@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ConversationResource extends JsonResource
+class MessageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,12 @@ class ConversationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
         return [
-            'sender_id' => $this['sender_id'],
-            'recipient_user' => new UserResource($this['recipient_user']),
-            'conversation_id' => $this['conversation_id'],
+        "id" => $this->id,
+        "conversation_id" => $this->conversation_id,
+        "sender_id" => $this->sender_id,
+        "content" => $this->content,
+        "message_type" => $this->message_type
         ];
     }
 }
