@@ -10,6 +10,7 @@ use App\Http\Resources\Api\UserResource;
 use App\Models\ConversationParticipants;
 use App\Models\Conversations;
 use App\Models\Messages;
+use App\Models\MessageStatuses;
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
 
@@ -56,13 +57,19 @@ class ChatsServices
         $user = auth()->user();
         if ($user) {
             if ($data) {
-                $conv = $user->participants->map(function ($participant) use ($data) {
+                $recipient_id = null;
+                $conv = $user->participants->map(function ($participant) use ($data, &$recipient_id)  { //& here to allow to make any update of the value of the recipient_id in side the map scope
+                    $recipient_id = $participant->select("user_id")->where('user_id' , "!=" , $data['sender_id'])->first();
                     return $participant->whereIn('user_id', [auth()->id(), $data['sender_id']])
                         ->select('conversation_id')
                         ->first();
                 });
                 if ($data["conversation_id"] == $conv[0]->conversation_id) {
                     $msg = Messages::create($data);
+                    MessageStatuses::create([
+                        "message_id"=>$msg->id,
+                        "user_id"=>$recipient_id->user_id,
+                    ]);
                     return $msg;
                 } else {
                     return ApiResponseTrait::Failed("Wrong Conversation", 404);

@@ -24,7 +24,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "user_name" => "required|string|max:40|unique:users,user_name",
+            "username" => "required|string|max:40|unique:users,username",
             "email"=> "required|email|unique:users,email",
             "password"=> "required|min:8|confirmed",
             "password_confirmation" =>"required"
@@ -34,10 +34,10 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            "user_name.required" => "user name field is required",
-            "user_name.unique" => "The user name has already been taken",
-            "user_name.string" => "user name must be string",
-            "user_name.max" => "The name cannot exceed 40 characters",
+            "username.required" => "user name field is required",
+            "username.unique" => "The user name has already been taken",
+            "username.string" => "user name must be string",
+            "username.max" => "The name cannot exceed 40 characters",
             "email.required" => "email field is required",
             "email.email" => "enter vaild email",
             "email.unique" => "The email has already been taken",

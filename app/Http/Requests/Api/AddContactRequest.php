@@ -23,8 +23,7 @@ class AddContactRequest extends FormRequest
     {
         return [
             "email" => "nullable|email|exists:users,email",
-            "user_name" => "nullable|string|exists:users,user_name"
-
+            "username" => "nullable|string|exists:users,username"
         ];
     }
 }

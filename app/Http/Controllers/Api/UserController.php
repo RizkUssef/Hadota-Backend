@@ -27,21 +27,23 @@ class UserController extends Controller
         $user = UserServices::getUser();
         if ($user) {
             return ApiResponseTrait::Success($user, "data returned successfully");
-        }else{
+        } else {
             return ApiResponseTrait::Failed("No user Found", 404);
         }
     }
     // get current chat 
-    public function getUserWithId($id){
+    public function getUserWithId($id)
+    {
         $user = UserServices::getUserWithId($id);
         if ($user) {
             return ApiResponseTrait::Success($user, "data returned successfully");
-        }else{
+        } else {
             return ApiResponseTrait::Failed("No user Found", 404);
         }
     }
 
-    public function allUsers(){
+    public function allUsers()
+    {
         $users = UserServices::getAllUsers();
         if ($users) {
             return ApiResponseTrait::Success($users, "data returned successfully");
@@ -59,7 +61,7 @@ class UserController extends Controller
         $user = UserServices::create($data);
         return ApiResponseTrait::Success($user, "user inserted successfully");
     }
-// ? return all user chats
+    // ? return all user chats
     // public function userChats()
     // {
     //     $contacts = UserServices::getUserChats();
@@ -100,7 +102,7 @@ class UserController extends Controller
         $user = $request->validated();
         if ($request->input("email") && $user["email"]) {
             return UserServices::addContact($user);
-        } elseif ($request->input("user_name") && $user["user_name"]) {
+        } elseif ($request->input("username") && $user["username"]) {
             return UserServices::addContact("", $user);
         }
     }
@@ -108,10 +110,10 @@ class UserController extends Controller
     public function addContactToConversation($contact_id)
     {
         $add_res = UserServices::addContactToConversation($contact_id);
-        if($add_res){
+        if ($add_res) {
             $chat_controller = new ChatController;
             return $chat_controller->currentChat($contact_id);
-        }else{
+        } else {
             return ApiResponseTrait::Failed("Conflict : you allready has this conversation", 409);
         }
     }

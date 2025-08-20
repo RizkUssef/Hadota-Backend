@@ -53,21 +53,21 @@ class UserServices
         return $user;
         // return UserResource::collection(collect([$user]));
     }
-    public static function getUserByUserName($user_name)
+    public static function getUserByUserName($username)
     {
-        // dd(["user"=>$user_name]);
-        $user = User::where("user_name", $user_name)->first();
+        // dd(["user"=>$username]);
+        $user = User::where("username", $username)->first();
         return $user;
         // return UserResource::collection(collect([$user]));
     }
 
-    public static function addContact($email = null, $user_name = null)
+    public static function addContact($email = null, $username = null)
     {
         $contact_user = null;
         if ($email != null) {
             $contact_user = self::getUserByEmail($email);
-        } elseif ($user_name != null) {
-            $contact_user = self::getUserByUserName($user_name);
+        } elseif ($username != null) {
+            $contact_user = self::getUserByUserName($username);
         }
         return self::addContactHandle($contact_user);
     }
@@ -85,7 +85,7 @@ class UserServices
                     $contact = Contacts::create([
                         "user_id" => auth()->id(),
                         "contact_id" => $contact_user->id,
-                        "nickname" => $contact_user->user_name,
+                        "nickname" => $contact_user->username,
                         "blocked" => 0
                     ]);
                     $contact_return = ContactResource::collection(collect([$contact]));
@@ -97,29 +97,30 @@ class UserServices
         }
     }
 
-    public static function addContactToConversation($contact_id){
+    public static function addContactToConversation($contact_id)
+    {
         $user = auth()->user();
-        if($user){
-            $contact = Contacts::select("contact_id","nickname")->where("contact_id",$contact_id)->first();
-            try{
+        if ($user) {
+            $contact = Contacts::select("contact_id", "nickname")->where("contact_id", $contact_id)->first();
+            try {
                 $conv = Conversations::create([
-                    "type"=>"private",
-                    "created_by"=>$user->id,
-                    "name"=>$contact->nickname,
+                    "type" => "private",
+                    "created_by" => $user->id,
+                    "name" => $contact->nickname,
                 ]);
                 $conv_part = ConversationParticipants::insert([
                     [
-                        "conversation_id"=>$conv->id,
-                        "user_id"=>$contact->contact_id,
+                        "conversation_id" => $conv->id,
+                        "user_id" => $contact->contact_id,
                     ],
                     [
-                        "conversation_id"=>$conv->id,
-                        "user_id"=>$user->id,
+                        "conversation_id" => $conv->id,
+                        "user_id" => $user->id,
                     ],
                 ]);
                 return true;
                 // return ApiResponseTrait::Success("","conversation added successfully");
-            }catch(QueryException $e){
+            } catch (QueryException $e) {
                 // dd($e);
                 return false;
             }
