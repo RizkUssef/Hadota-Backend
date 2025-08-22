@@ -45,6 +45,14 @@ class ChatController extends Controller
             return ApiResponseTrait::Failed("No data found", 404);
         }
     }
+    public function getConversationsParticipants(){
+        $convs = ChatsServices::getConversationsParticipants();
+        if($convs){
+            return ApiResponseTrait::Success($convs, "data returned successfully");
+        }else{
+            return ApiResponseTrait::Failed("No data found", 404);
+        }
+    }
 
 
     public function sendMessage(MessageRequest $request)

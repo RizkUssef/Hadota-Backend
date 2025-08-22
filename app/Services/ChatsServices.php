@@ -42,12 +42,32 @@ class ChatsServices
                     ->where('user_id', '!=', auth()->id())
                     ->map(function ($participant) use ($conv) {
                         return [
-                            "sender_id"=>auth()->id(),
+                            "sender_id" => auth()->id(),
                             "recipient_user" => $participant->user,
                             "conversation_id" => $conv->id
                         ];
                     });
             })->unique(fn($item) => $item['conversation_id'])->values();
+            return ConversationResource::collection($user_conversations);
+        }
+    }
+    public static function getConversationsParticipants()
+    {
+        $user = auth()->user();
+        if ($user) {
+            $user = User::with('conversations.participants.user')->find(auth()->id());
+            $user_conversations = $user->participants
+                ->flatMap(function ($part) {
+                    return $part->conversation->participants
+                        ->where('user_id', '!=', auth()->id())
+                        ->map(fn($p) => [
+                            "sender_id"       => auth()->id(),
+                            "recipient_user"  => $p->user,
+                            "conversation_id" => $part->conversation_id,
+                        ]);
+                })
+                ->unique(fn($item) => $item['conversation_id'])
+                ->values();
             return ConversationResource::collection($user_conversations);
         }
     }
@@ -58,17 +78,23 @@ class ChatsServices
         if ($user) {
             if ($data) {
                 $recipient_id = null;
-                $conv = $user->participants->map(function ($participant) use ($data, &$recipient_id)  { //& here to allow to make any update of the value of the recipient_id in side the map scope
-                    $recipient_id = $participant->select("user_id")->where('user_id' , "!=" , $data['sender_id'])->first();
+                $conv = $user->participants->map(function ($participant) use ($data, &$recipient_id) { //& here to allow to make any update of the value of the recipient_id in side the map scope
+                    $recipient_id = $participant->select("user_id")
+                        ->where('user_id', "!=", $data['sender_id'])
+                        ->where('conversation_id', $data["conversation_id"])
+                        ->first();
+                    // dd($recipient_id?->user_id);
                     return $participant->whereIn('user_id', [auth()->id(), $data['sender_id']])
+                        ->where('conversation_id', $data["conversation_id"])
                         ->select('conversation_id')
                         ->first();
                 });
+                // dd($conv[0]->conversation_id);
                 if ($data["conversation_id"] == $conv[0]->conversation_id) {
                     $msg = Messages::create($data);
                     MessageStatuses::create([
-                        "message_id"=>$msg->id,
-                        "user_id"=>$recipient_id->user_id,
+                        "message_id" => $msg->id,
+                        "user_id" => $recipient_id?->user_id,
                     ]);
                     return $msg;
                 } else {
@@ -79,10 +105,11 @@ class ChatsServices
     }
 
     // ?get msgs
-    public static function getMessages($conv_id){
+    public static function getMessages($conv_id)
+    {
         $user = auth()->user();
-        if($user){
-            $messages = Messages::where("conversation_id",$conv_id)->get();
+        if ($user) {
+            $messages = Messages::where("conversation_id", $conv_id)->get();
             return MessageResource::collection($messages);
         }
     }

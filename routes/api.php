@@ -27,5 +27,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get("chat messages/{id}", [ChatController::class, "getMessages"])->name("chat message");
     Route::post("send msg", [ChatController::class, "sendMessage"])->name("send msg");
     Route::get("user-conversations/{id?}", [ChatController::class, "getConversations"])->name("user conversations");
+    Route::get("user-conversations-part", [ChatController::class, "getConversationsParticipants"])->name("user conversations part");
 });
 

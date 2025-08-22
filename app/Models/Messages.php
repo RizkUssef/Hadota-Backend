@@ -29,7 +29,7 @@ class Messages extends Model
 
     public function statuses()
     {
-        return $this->hasMany(MessageStatuses::class);
+        return $this->hasMany(MessageStatuses::class,"message_id");
     }
 
     public function attachments()
