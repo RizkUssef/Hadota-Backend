@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\MessageRequest;
 use App\Models\Conversations;
@@ -60,6 +61,7 @@ class ChatController extends Controller
         $data = $request->validated();
         $message = ChatsServices::sendMessage($data);
         if($message){
+            event(new MessageSent($message));
             return ApiResponseTrait::Success($message, "message sent successfully");
         }else{
             return ApiResponseTrait::Failed("failed to send message",404);
