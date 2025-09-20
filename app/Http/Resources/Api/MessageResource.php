@@ -19,7 +19,8 @@ class MessageResource extends JsonResource
         "conversation_id" => $this->conversation_id,
         "senderId" => $this->sender_id,
         "content" => $this->content,
-        "message_type" => $this->message_type
+        "message_type" => $this->message_type,
+        "message_status"=>MessageStatusResource::collection($this->whenLoaded("statuses"))
         ];
     }
 }

@@ -55,6 +55,14 @@ class ChatController extends Controller
         }
     }
 
+    public function getConversationsMessagesStatus($conv_id){
+        $convs = ChatsServices::getConversationsMessagesStatus($conv_id);
+        if($convs){
+            return ApiResponseTrait::Success($convs, "data returned successfully");
+        }else{
+            return ApiResponseTrait::Failed("No data found", 404);
+        }
+    }
 
     public function sendMessage(MessageRequest $request)
     {

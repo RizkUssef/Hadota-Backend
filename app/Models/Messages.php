@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Casts\DateFormateCast;
+use App\Casts\TimeFormateCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Ramsey\Uuid\Type\Time;
 
 class Messages extends Model
 {
@@ -14,9 +17,14 @@ class Messages extends Model
         'sender_id',
         'content',
         'message_type',
-        'edited_at'
+        'edited_at',
+        'created_at',
+        'updated_at'
     ];
-
+        protected $casts =[
+        "created_at" => DateFormateCast::class,
+        "updated_at" => DateFormateCast::class,
+    ];
     public function conversation()
     {
         return $this->belongsTo(Conversations::class);

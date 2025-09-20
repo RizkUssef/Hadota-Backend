@@ -19,6 +19,8 @@ class ConversationResource extends JsonResource
             'sender_id' => $this['sender_id'],
             'recipient_user' => new UserResource($this['recipient_user']),
             'conversation_id' => $this['conversation_id'],
+            'unread_message_count' => $this['unread_message_count'],
+            'last_message' => $this['last_message']
         ];
     }
 }

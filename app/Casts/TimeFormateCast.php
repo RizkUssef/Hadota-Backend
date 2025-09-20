@@ -6,7 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
-class DateFormateCast implements CastsAttributes
+class TimeFormateCast implements CastsAttributes
 {
     // protected $short;
      public function __construct(protected bool $short = false){ }
@@ -17,15 +17,8 @@ class DateFormateCast implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        $date = Carbon::parse($value);
-        if($date->isToday()){
-            return "Today";  
-        }        
-        if ($date->isYesterday()) {
-            return "Yesterday";
-        }else{
-            return $date->format('Y-m-d');
-        }
+        return Carbon::parse($value)->format('h:m');  
+        // return Carbon::parse($value)->diffForHumans(short:$this->short);  
     }
 
     /**
