@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ Route::post("/login", [LoginController::class, "login"])->name("api login");
 Route::apiResources([
     'user' => UserController::class,
 ]);
-Route::middleware(['jwt.auth'])->group(function () {
+
+Route::middleware(['jwt.auth','lastSeen'])->group(function () {
     Route::post("userupdate", [UserController::class, "updateUser"])->name("update user");
     Route::post("add contant", [UserController::class, "addContact"])->name("add contact");
     Route::get("add conversation/{contact_id}", [UserController::class, "addContactToConversation"])->name("add convs");
@@ -28,6 +30,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post("send msg", [ChatController::class, "sendMessage"])->name("send msg");
     Route::get("user-conversations/{id?}", [ChatController::class, "getConversations"])->name("user conversations");
     Route::get("user-conversations-part", [ChatController::class, "getConversationsParticipants"])->name("user conversations part");
-    Route::get("user-conver-messages-status/{id}", [ChatController::class, "getConversationsMessagesStatus"])->name("user conversations messages status");
+    Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
+    Route::get("read messages/{id}", [ChatController::class, "readMessage"])->name("read message");
 });
 

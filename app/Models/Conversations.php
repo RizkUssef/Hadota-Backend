@@ -40,7 +40,7 @@ class Conversations extends Model
         return $this->hasMany(Messages::class,"conversation_id")
             ->whereHas('statuses', function ($q) {
                 $q->where('user_id', auth()->id())
-                    ->where('status', 'sent');
+                    ->where('status', 'delivered');
             });
     }
 }

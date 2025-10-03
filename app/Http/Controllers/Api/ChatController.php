@@ -21,7 +21,7 @@ class ChatController extends Controller
         $contacts = ChatsServices::userContacts();
         if (!empty($contacts)) {
             return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
-        }else{
+        } else {
             return ApiResponseTrait::Failed("No contacts Found", 404);
         }
     }
@@ -38,28 +38,21 @@ class ChatController extends Controller
     }
 
     // ? get the all conversation and current conv
-    public function getConversations($id = null){
+    public function getConversations($id = null)
+    {
         $convs = ChatsServices::getConversations($id);
-        if($convs){
+        if ($convs) {
             return ApiResponseTrait::Success($convs, "data returned successfully");
-        }else{
+        } else {
             return ApiResponseTrait::Failed("No data found", 404);
         }
     }
-    public function getConversationsParticipants(){
+    public function getConversationsParticipants()
+    {
         $convs = ChatsServices::getConversationsParticipants();
-        if($convs){
+        if ($convs) {
             return ApiResponseTrait::Success($convs, "data returned successfully");
-        }else{
-            return ApiResponseTrait::Failed("No data found", 404);
-        }
-    }
-
-    public function getConversationsMessagesStatus($conv_id){
-        $convs = ChatsServices::getConversationsMessagesStatus($conv_id);
-        if($convs){
-            return ApiResponseTrait::Success($convs, "data returned successfully");
-        }else{
+        } else {
             return ApiResponseTrait::Failed("No data found", 404);
         }
     }
@@ -68,16 +61,27 @@ class ChatController extends Controller
     {
         $data = $request->validated();
         $message = ChatsServices::sendMessage($data);
-        if($message){
+        if ($message) {
             event(new MessageSent($message));
             return ApiResponseTrait::Success($message, "message sent successfully");
-        }else{
-            return ApiResponseTrait::Failed("failed to send message",404);
+        } else {
+            return ApiResponseTrait::Failed("failed to send message", 404);
         }
     }
 
-    public function getMessages($id){
+    public function getMessages($id)
+    {
         $messages = ChatsServices::getMessages($id);
+        if ($messages) {
+            return ApiResponseTrait::Success($messages, "all messages returned successfully");
+        } else {
+            return ApiResponseTrait::Failed("failed to send message", 404);
+        }
+    }
+
+    public function readMessage($conv_id)
+    {
+        $messages = ChatsServices::readMessage($conv_id);
         if ($messages) {
             return ApiResponseTrait::Success($messages, "all messages returned successfully");
         } else {

@@ -27,7 +27,6 @@ class ChatsServices
             return UserResource::collection($contactUsers);
         }
     }
-
     // ?get all convs and current conv (one or all)
     public static function getConversations($conv_id = null)
     {
@@ -56,7 +55,6 @@ class ChatsServices
         $user = auth()->user();
         if ($user) {
             $user = User::with(['conversations.participants.user.statuses', "conversations.messages.statuses"])->find(auth()->id());
-            // dd($user->statuses->where("status", "sent")->count());
             $user_conversations = $user->participants
                 ->flatMap(function ($part) {
                     return $part->conversation->participants
@@ -65,9 +63,8 @@ class ChatsServices
                             "sender_id"       => auth()->id(),
                             "recipient_user"  => $p->user,
                             "conversation_id" => $part->conversation_id,
-                            // "conversation_messages" => ChatsServices::getMessages($part->conversation_id)
-                            "unread_message_count" =>$part->conversation->unreadMessages->count(),
-                            "last_message"=>$part->conversation->lastMessage,
+                            "unread_message_count" => $part->conversation->unreadMessages->count(),
+                            "last_message" => $part->conversation->lastMessage,
                         ]);
                 })
                 ->unique(fn($item) => $item['conversation_id'])
@@ -75,17 +72,6 @@ class ChatsServices
             return ConversationResource::collection($user_conversations);
         }
     }
-
-    public static function getConversationsMessagesStatus($conv_id) {
-        $conves = Conversations::with('messages.statuses')->findOrFail($conv_id);
-        dd(
-            $conves->unreadMessages->count(),
-            $conves->lastMessage
-        );
-
-        // return MessageResource::collection($conves->messages);
-    }
-
     public static function sendMessage($data)
     {
         $user = auth()->user();
@@ -97,13 +83,11 @@ class ChatsServices
                         ->where('user_id', "!=", $data['sender_id'])
                         ->where('conversation_id', $data["conversation_id"])
                         ->first();
-                    // dd($recipient_id?->user_id);
                     return $participant->whereIn('user_id', [auth()->id(), $data['sender_id']])
                         ->where('conversation_id', $data["conversation_id"])
                         ->select('conversation_id')
                         ->first();
                 });
-                // dd($conv[0]->conversation_id);
                 if ($data["conversation_id"] == $conv[0]->conversation_id) {
                     $msg = Messages::create($data);
                     MessageStatuses::create([
@@ -117,14 +101,19 @@ class ChatsServices
             }
         }
     }
-
     // ?get msgs
     public static function getMessages($conv_id)
     {
-        $user = auth()->user();
-        if ($user) {
-            $messages = Messages::with('statuses')->where("conversation_id", $conv_id)->get();
-            return MessageResource::collection($messages);
-        }
+        $messages = Messages::with('statuses')->where("conversation_id", $conv_id)->get();
+        return MessageResource::collection($messages);
     }
+    // ?read msg
+    public static function readMessage($conv_id)
+    {
+        $messages = Messages::with('statuses')->where("conversation_id", $conv_id)->whereHas('statuses',function($q){
+            $q->where('status', 'delivered')->update(['status'=>'read']);
+        })->get();
+        return MessageResource::collection($messages);
+    }
+
 }

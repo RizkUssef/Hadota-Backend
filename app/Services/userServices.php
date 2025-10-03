@@ -147,4 +147,9 @@ class UserServices
         $users = User::paginate(15);
         return $users;
     }
+
+public static function joinPresenceChannel()
+{
+    auth()->user()->update(['status' => 'online']);
+}
 }
