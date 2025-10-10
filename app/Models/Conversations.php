@@ -37,7 +37,7 @@ class Conversations extends Model
 
     public function unreadMessages()
     {
-        return $this->hasMany(Messages::class,"conversation_id")
+        return $this->hasMany(Messages::class, "conversation_id")
             ->whereHas('statuses', function ($q) {
                 $q->where('user_id', auth()->id())
                     ->where('status', 'delivered');

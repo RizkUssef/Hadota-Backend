@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ChangeUserStatus;
 use App\Http\Requests\Api\GetUserByEmail;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Resources\Api\ContactResource;
@@ -147,9 +148,4 @@ class UserServices
         $users = User::paginate(15);
         return $users;
     }
-
-public static function joinPresenceChannel()
-{
-    auth()->user()->update(['status' => 'online']);
-}
 }

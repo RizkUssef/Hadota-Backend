@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ChangeUserStatus;
+use App\Events\UserStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\AddContactRequest;
 use App\Http\Requests\Api\GetUserByEmail;
@@ -61,14 +63,6 @@ class UserController extends Controller
         $user = UserServices::create($data);
         return ApiResponseTrait::Success($user, "user inserted successfully");
     }
-    // ? return all user chats
-    // public function userChats()
-    // {
-    //     $contacts = UserServices::getUserChats();
-    //     if ($contacts) {
-    //         return ApiResponseTrait::Success($contacts, "your contacts returned successfully");
-    //     }
-    // }
 
     /**
      * Update the specified resource in storage.
@@ -116,5 +110,14 @@ class UserController extends Controller
         } else {
             return ApiResponseTrait::Failed("Conflict : you allready has this conversation", 409);
         }
+    }
+
+    public function updateUserStatus($status)
+    {
+        $user = Auth::user();
+        $user->status = $status;
+        $user->save();
+        broadcast(new UserStatusUpdated($user, $status));
+        return ApiResponseTrait::Success($user, "status changed successfully", 200);
     }
 }

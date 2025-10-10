@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['jwt.auth'])->group(function () {
@@ -14,13 +15,17 @@ use Illuminate\Support\Facades\Route;
 //     });
 // });
 
+Broadcast::routes(['middleware' => ['auth:sanctum']]); 
+// or 'auth:api' depending on your guard
+
+
 Route::post("/login", [LoginController::class, "login"])->name("api login");
 
 Route::apiResources([
     'user' => UserController::class,
 ]);
 
-Route::middleware(['jwt.auth','lastSeen'])->group(function () {
+Route::middleware(['jwt.auth'])->group(function () {
     Route::post("userupdate", [UserController::class, "updateUser"])->name("update user");
     Route::post("add contant", [UserController::class, "addContact"])->name("add contact");
     Route::get("add conversation/{contact_id}", [UserController::class, "addContactToConversation"])->name("add convs");
@@ -32,5 +37,6 @@ Route::middleware(['jwt.auth','lastSeen'])->group(function () {
     Route::get("user-conversations-part", [ChatController::class, "getConversationsParticipants"])->name("user conversations part");
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get("read messages/{id}", [ChatController::class, "readMessage"])->name("read message");
+    Route::post("change-status/{status}", [UserController::class, "updateUserStatus"])->name("change user status");
 });
 

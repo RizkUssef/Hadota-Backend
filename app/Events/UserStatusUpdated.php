@@ -11,18 +11,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChangeUserStatus implements ShouldBroadcast
+class UserStatusUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $user;
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
+    public function __construct(public User $user, public string $status) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -32,15 +28,15 @@ class ChangeUserStatus implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('user-status'),
+            new PrivateChannel('user.status.' . $this->user->id),
         ];
     }
 
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
-        // Wrap the message in the Resource
         return [
-            'user' => new User([$this->user]),
+            'user_id' => $this->user->id,
+            'status' => $this->status,
         ];
     }
 }

@@ -20,7 +20,9 @@ class MessageResource extends JsonResource
         "senderId" => $this->sender_id,
         "content" => $this->content,
         "message_type" => $this->message_type,
-        "message_status"=>MessageStatusResource::collection($this->whenLoaded("statuses"))
+        "message_status"=>MessageStatusResource::collection($this->whenLoaded("statuses")),
+        "created_at" => $this->created_at,
+        "updated_at" => $this->updated_at,
         ];
     }
 }

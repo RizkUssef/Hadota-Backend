@@ -18,16 +18,24 @@ class DateFormateCast implements CastsAttributes
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
         $date = Carbon::parse($value);
-        if($date->isToday()){
-            return "Today";  
+        if($date->isToday()){ 
+            return [
+                "date" => "Today",
+                "time" => $date->format('h:i A'),
+            ];
         }        
         if ($date->isYesterday()) {
-            return "Yesterday";
+            return [
+                "date" => "Yesterday",
+                "time" => $date->format('h:i A'),
+            ];
         }else{
-            return $date->format('Y-m-d');
+            return [
+                "date" => $date->format('D, M j, y'),
+                "time" => $date->format('h:i A'),
+            ];
         }
     }
-
     /**
      * Prepare the given value for storage.
      *

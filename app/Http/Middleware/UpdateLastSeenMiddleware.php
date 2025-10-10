@@ -16,7 +16,7 @@ class UpdateLastSeenMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {
-            auth()->user()->update(['last_seen_at' => now(),'status'=>'online']);
+            // auth()->user()->update(['last_seen_at' => now(),'status'=>'online']);
         }
         return $next($request);
     }

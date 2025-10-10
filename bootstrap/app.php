@@ -10,6 +10,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Middleware\HandleCors;
+use ParagonIE\Sodium\Core\Curve25519\H;
 use Tymon\JWTAuth\Http\Middleware\RefreshToken;
 // use Tymon\JWTAuth\Http\Middleware\Authenticate;
 
@@ -33,7 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // UpdateLastSeenMiddleware::class
         ]);
         $middleware->alias([
-            'lastSeen' => UpdateLastSeenMiddleware::class,
+            // 'lastSeen' => UpdateLastSeenMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
