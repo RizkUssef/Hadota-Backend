@@ -114,9 +114,7 @@ class UserController extends Controller
 
     public function updateUserStatus($status)
     {
-        $user = Auth::user();
-        $user->status = $status;
-        $user->save();
+        $user = UserServices::changeUserStatus($status);
         broadcast(new UserStatusUpdated($user, $status));
         return ApiResponseTrait::Success($user, "status changed successfully", 200);
     }

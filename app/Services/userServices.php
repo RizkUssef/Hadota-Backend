@@ -148,4 +148,12 @@ class UserServices
         $users = User::paginate(15);
         return $users;
     }
+
+    public static function changeUserStatus($status)
+    {
+        $user = Auth::user();
+        $user->status = $status;
+        $user->save();
+        return $user;
+    }
 }
